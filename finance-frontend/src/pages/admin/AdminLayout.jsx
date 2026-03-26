@@ -1,8 +1,8 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-import {
-  TrendingUp, LayoutDashboard, FileText, Users, LogOut, ChevronRight, Bell
+import { 
+  TrendingUp, LayoutDashboard, FileText, Users, LogOut, ChevronRight, Bell 
 } from 'lucide-react';
 import './AdminLayout.css';
 
@@ -14,38 +14,33 @@ const navItems = [
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
-  const navigate         = useNavigate();
-  const location         = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success('Logged out');
+      toast.success('Logged out successfully');
       navigate('/login');
     } catch (err) {
       toast.error('Logout failed');
     }
   };
 
-  const isActive = (path, exact) =>
+  const isActive = (path, exact) => 
     exact ? location.pathname === path : location.pathname.startsWith(path);
 
-  // Determine page title based on route
   const activeNavItem = navItems.find(n => isActive(n.to, n.exact));
 
   return (
-    <div className="admin-layout">
-      {/* Sidebar Navigation */}
-      <aside className="admin-sidebar">
-        <div className="sidebar-header">
-          <div className="brand-wrapper">
-            <div className="brand-logo">
-              <TrendingUp size={20} />
-            </div>
-            <div className="brand-info">
-              <p>FinanceApp</p>
-              <span>Admin Panel</span>
-            </div>
+    <div className="admin-container">
+      {/* --- Sidebar --- */}
+      <aside className="sidebar">
+        <div className="sidebar-brand">
+          <div className="logo-icon"><TrendingUp size={22} /></div>
+          <div className="brand-text">
+            <h3>FinanceApp</h3>
+            <span>Admin Console</span>
           </div>
         </div>
 
@@ -53,54 +48,49 @@ export default function AdminLayout() {
           {navItems.map(({ to, label, icon: Icon, exact }) => (
             <Link 
               key={to} 
-              to={to}
-              className={`nav-item ${isActive(to, exact) ? 'active' : ''}`}
+              to={to} 
+              className={`nav-link ${isActive(to, exact) ? 'active' : ''}`}
             >
-              <Icon size={18} className="nav-icon" />
+              <Icon size={20} />
               <span>{label}</span>
-              {isActive(to, exact) && <ChevronRight size={14} className="chevron" />}
+              {isActive(to, exact) && <div className="active-indicator" />}
             </Link>
           ))}
         </nav>
 
-        <div className="sidebar-footer">
-          <div className="user-pill">
-            <div className="user-avatar">
-              {user?.name ? user.name[0].toUpperCase() : 'A'}
-            </div>
-            <div className="user-meta">
-              <span className="u-name">{user?.name}</span>
-              <span className="u-email">{user?.email}</span>
+        <div className="sidebar-user">
+          <div className="user-info">
+            <div className="avatar">{user?.name?.[0] || 'A'}</div>
+            <div className="details">
+              <p className="u-name">{user?.name || 'Administrator'}</p>
+              <p className="u-role">Super Admin</p>
             </div>
           </div>
-          
-          <button onClick={handleLogout} className="logout-trigger">
-            <LogOut size={16} />
-            <span>Sign out</span>
+          <button onClick={handleLogout} className="logout-btn">
+            <LogOut size={18} />
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="admin-main">
-        <header className="top-bar">
-          <h2>{activeNavItem ? activeNavItem.label : 'Admin Overview'}</h2>
-          
-          <div className="header-actions">
-            <button className="notification-btn" title="Notifications">
-              <Bell size={18} />
-              <span className="dot" />
-            </button>
-            
-            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--admin-text-main)' }}>
-              Administrator
+      {/* --- Main Content --- */}
+      <main className="main-content">
+        <header className="main-header">
+          <div className="header-left">
+            <h1>{activeNavItem ? activeNavItem.label : 'Overview'}</h1>
+          </div>
+          <div className="header-right">
+            <button className="icon-button"><Bell size={20} /><span className="badge" /></button>
+            <div className="divider" />
+            <div className="header-profile">
+              <span>Admin Mode</span>
             </div>
           </div>
         </header>
 
-        <div className="content-body">
+        <section className="content-area">
           <Outlet />
-        </div>
+        </section>
       </main>
     </div>
   );
